@@ -1,0 +1,31 @@
+# Fly.io configuration
+# Deploy with: fly deploy
+
+app = "browser-learning-agent"
+primary_region = "syd"  # Sydney, Australia (close to NZ)
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  LLM_PROVIDER = "anthropic"
+  EMAIL_PROVIDER = "resend"
+  NOTIFICATION_EMAIL = "caique.rivero@gmail.com"
+  HEADLESS = "true"
+  MAX_ITERATIONS = "100"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 2
+  memory_mb = 2048
+
+[mounts]
+  source = "agent_data"
+  destination = "/app/data"

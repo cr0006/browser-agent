@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Data directories
+data/sessions/*
+!data/sessions/.gitkeep
+data/screenshots/*
+!data/screenshots/.gitkeep
+data/learned_patterns/*
+!data/learned_patterns/.gitkeep
+data/*.pickle
+data/*.json
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build
+dist/
+build/
+*.egg-info/
+# OS files
+.DS_Store
+
+# Temporary files
+.tmp/

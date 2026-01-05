@@ -1,0 +1,47 @@
+# Cloud Run configuration for Google Cloud Platform
+# Deploy with: gcloud run deploy browser-agent --source .
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: browser-learning-agent
+  labels:
+    app: browser-agent
+spec:
+  template:
+    metadata:
+      annotations:
+        # Allow up to 15 minutes for learning sessions
+        run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/cpu-throttling: "false"
+        autoscaling.knative.dev/maxScale: "5"
+    spec:
+      containerConcurrency: 1  # One learning session per instance
+      timeoutSeconds: 900  # 15 minute timeout
+      containers:
+        - image: gcr.io/PROJECT_ID/browser-learning-agent:latest
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          env:
+            - name: LLM_PROVIDER
+              value: anthropic
+            - name: LLM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: llm-api-key
+                  key: latest
+            - name: EMAIL_PROVIDER
+              value: resend
+            - name: EMAIL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: email-api-key
+                  key: latest
+            - name: NOTIFICATION_EMAIL
+              value: caique.rivero@gmail.com
+            - name: HEADLESS
+              value: "true"
+          ports:
+            - containerPort: 8080

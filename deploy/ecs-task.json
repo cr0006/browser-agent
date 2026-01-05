@@ -1,0 +1,81 @@
+# AWS ECS Task Definition for Fargate deployment
+# Deploy with: aws ecs register-task-definition --cli-input-json file: //ecs-task.json
+{
+    "family": "browser-learning-agent",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "2048",
+    "memory": "4096",
+    "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::ACCOUNT_ID:role/browser-agent-task-role",
+    "containerDefinitions": [
+        {
+            "name": "browser-agent",
+            "image": "ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/browser-learning-agent:latest",
+            "essential": true,
+            "environment": [
+                {
+                    "name": "LLM_PROVIDER",
+                    "value": "anthropic"
+                },
+                {
+                    "name": "EMAIL_PROVIDER",
+                    "value": "resend"
+                },
+                {
+                    "name": "NOTIFICATION_EMAIL",
+                    "value": "caique.rivero@gmail.com"
+                },
+                {
+                    "name": "HEADLESS",
+                    "value": "true"
+                }
+            ],
+            "secrets": [
+                {
+                    "name": "LLM_API_KEY",
+                    "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:browser-agent/llm-api-key"
+                },
+                {
+                    "name": "EMAIL_API_KEY",
+                    "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:browser-agent/email-api-key"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/browser-learning-agent",
+                    "awslogs-region": "REGION",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "mountPoints": [
+                {
+                    "sourceVolume": "agent-data",
+                    "containerPath": "/app/data"
+                }
+            ],
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "python -c 'from src.config import Config; Config()' || exit 1"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 60
+            }
+        }
+    ],
+    "volumes": [
+        {
+            "name": "agent-data",
+            "efsVolumeConfiguration": {
+                "fileSystemId": "fs-XXXXXXXX",
+                "rootDirectory": "/browser-agent"
+            }
+        }
+    ]
+}

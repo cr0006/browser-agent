@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  browser-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: browser-learning-agent
+    environment:
+      - LLM_PROVIDER=${LLM_PROVIDER:-anthropic}
+      - LLM_MODEL=${LLM_MODEL:-claude-sonnet-4-20250514}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - EMAIL_PROVIDER=${EMAIL_PROVIDER:-resend}
+      - EMAIL_API_KEY=${EMAIL_API_KEY}
+      - NOTIFICATION_EMAIL=${NOTIFICATION_EMAIL:-caique.rivero@gmail.com}
+      - HEADLESS=true
+      - MAX_ITERATIONS=${MAX_ITERATIONS:-100}
+      - CONFIDENCE_THRESHOLD=${CONFIDENCE_THRESHOLD:-0.85}
+    volumes:
+      - ./data:/app/data
+    networks:
+      - agent-network
+    restart: unless-stopped
+    # For one-off learning tasks, override command:
+    # docker-compose run browser-agent learn https://example.com
+
+  # Optional: Redis for distributed task queue (future enhancement)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: agent-redis
+  #   networks:
+  #     - agent-network
+
+networks:
+  agent-network:
+    driver: bridge
+
+volumes:
+  agent-data:
+    driver: local

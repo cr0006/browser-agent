@@ -1,0 +1,27 @@
+# Core dependencies
+playwright
+anthropic
+openai
+pydantic
+pydantic-settings
+python-dotenv
+
+# Email services
+resend
+google-auth
+google-auth-oauthlib
+google-api-python-client
+
+# Storage
+chromadb
+aiosqlite
+
+# Logging & CLI
+structlog
+typer
+rich
+
+# Development & Testing
+pytest
+pytest-asyncio
+pytest-cov
